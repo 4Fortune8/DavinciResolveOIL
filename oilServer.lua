@@ -35,7 +35,7 @@ function receive_text(data)
 end
 
 -- Server
-local port = 55000
+local port = 55500
 
 -- Set up server socket configuration
 local info = socket.find_first_address("*", port)
@@ -52,8 +52,15 @@ assert(server:bind(info))
 assert(server:listen())
 
 function CreateResponse(body)
-    local header = "HTTP/1.1 200 OK\r\n" .. "Server: ljsocket/0.1\r\n" .. "Content-Type: application/json\r\n" ..
-                       "Content-Length: " .. #body .. "\r\n" .. "Connection: close\r\n" .. "\r\n"
+    local header = "HTTP/1.1 200 OK\r\n" ..
+                   "Server: ljsocket/0.1\r\n" ..
+                   "Content-Type: application/json\r\n" ..
+                   "Content-Length: " .. #body .. "\r\n" ..
+                   "Connection: close\r\n" ..
+                   "Access-Control-Allow-Origin: *\r\n" ..  -- Add CORS header
+                   "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" ..  -- Add allowed methods
+                   "Access-Control-Allow-Headers: Content-Type\r\n" ..  -- Add allowed headers
+                   "\r\n"
 
     local response = header .. body
     return response
@@ -140,7 +147,9 @@ while not quitServer do
                     elseif data.func == "Exit" then
                         print("Exiting server")
                         quitServer = true
-                        client:close()
+                        body = json.encode({
+                            message = "Job completed"
+                        })
                     else
                         print("Invalid function name")
                     end
