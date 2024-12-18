@@ -1,0 +1,31 @@
+{
+    "manifest_version": 3,
+    "name": "Tab Audio Capture",
+    "version": "1.0",
+    "description": "Capture audio from the current tab and save it.",
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "scripting",
+        "downloads",
+        "contextMenus",
+        "menus",
+        "<all_urls>"
+      ],
+    "background": {
+      "service_worker": "background.js",
+      "scripts": [
+        "background.js"
+      ]
+    },
+    "host_permissions": [
+      "*://*/*"
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "48": "icons/icon.png"
+      }
+    }
+  }
+  
