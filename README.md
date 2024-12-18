@@ -16,5 +16,5 @@ Same thing, scrip file path is "/Library/Application Support/Blackmagic Design/D
 **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/davinchi-oil/)** | **[Chrome]** Dev Only Option currently
 
 ##This is early beta, join my discord or leave an issue  
-![Discord Shield](https://discord.com/api/guilds/fC8wPvzWT7/widget.png?style=shield)
+![Discord Shield](https://discord.com/api/guilds/1239670350938112090/widget.png?style=shield)
 https://discord.gg/fC8wPvzWT7
