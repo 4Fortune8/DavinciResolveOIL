@@ -19,8 +19,7 @@
         }
     },
     "host_permissions": [
-        "http://localhost:55000/*",
-        "<all_urls>"
+        "http://localhost:55500/*"
     ],"commands": {
     "open-screen-captue": {
       "suggested_key": {

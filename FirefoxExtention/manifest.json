@@ -21,9 +21,6 @@
           "128": "./images/icon-128x128.png"
       }
   },
-  "host_permissions": [
-      "http://localhost:55000/*",
-      "<all_urls>"
-  ]
+ "host_permissions": ["http://localhost:55500/*"]
 }
   

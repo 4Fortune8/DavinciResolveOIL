@@ -144,7 +144,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 function exit() {
-  const apiUrl = `http://localhost:55000`; // Replace with your local API endpoint
+  const apiUrl = `http://localhost:55500`; // Replace with your local API endpoint
   console.log("Sending exit to API:", apiUrl);
   return fetch(apiUrl, {
     method: "POST",
@@ -170,7 +170,7 @@ function exit() {
     });
 }
 function sendStringToApi(apiPath,stringSent) {
-  const apiUrl = `http://localhost:55000`; // Replace with your local API endpoint
+  const apiUrl = `http://localhost:55500`; // Replace with your local API endpoint
   console.log("Sending stringSent to API:", apiUrl);
   return fetch(apiUrl, {
     method: "POST",
