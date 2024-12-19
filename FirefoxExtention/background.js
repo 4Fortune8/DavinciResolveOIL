@@ -33,20 +33,6 @@ function makenotifications(title, message) {
 
 
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-    if (changeInfo.status === "complete") {
-      browser.scripting
-        .executeScript({
-          target: { tabId },
-          files: ["./content.js"],
-        })
-        .then(() => {
-          console.log("content script injected");
-        })
-        .catch((err) => console.log(err, "error injecting script"));
-    }
-  });
-  
 // Handle the context menu click
 browser.contextMenus.onClicked.addListener((info) => {
   console.log(info);
@@ -75,60 +61,9 @@ browser.contextMenus.onClicked.addListener((info) => {
   }
 });
 
-browser.commands.onCommand.addListener((command) => {
-  console.log(`Command: ${command}`);
-  if (command === "open-screen-captue") {
-    // Get the current active tab
-    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        const currentTab = tabs[0];
-        console.log("Current Tab:", currentTab);
-
-        // Perform any action with the current tab
-        // For example, you can send a message to the content script
-        browser.tabs.sendMessage(
-          currentTab.id,
-          { action: "recording_request" },
-          (response) => {
-            if (browser.runtime.lastError) {
-              console.error(
-                "Error sending message:",
-                browser.runtime.lastError.message
-              );
-              const title = "Screen Recorder Error";
-              const message =
-                "Failed to start screen recording. Please refresh the page, or go to a different tab to start capture.";
-              makenotifications(title, message);
-            } else {
-              console.log("Response from content script:", response);
-              if (response === undefined) {
-                const title = "cannot start capture on base browser pages";
-                const message =
-                  "Failed to start screen recording. Please or go to a different tab or page to start capture.";
-                makenotifications(title, message);
-              }
-            }
-          }
-        );
-      } else {
-        console.error("No active tab found");
-      }
-    });
-  }
-});
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "get_tab_title") {
-    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        sendResponse({ tabTitle: tabs[0].title });
-      } else {
-        sendResponse({ tabTitle: null });
-      }
-    });
-    return true; // Keep the message channel open for sendResponse
-    //the file save name to send to the backend. 
-  } else if (message.action === "save_name") {
+ if (message.action === "save_name") {
     sendStringToApi('save_video',message.saveName).then((result) => {
       if (result != "true") {
         console.log(result);
@@ -140,6 +75,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 });
+
 function exit() {
   const apiUrl = `http://localhost:55500`; // Replace with your local API endpoint
   console.log("Sending exit to API:", apiUrl);
