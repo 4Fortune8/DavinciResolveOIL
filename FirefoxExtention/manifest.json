@@ -1,26 +1,23 @@
 {
   "manifest_version": 2,
   "name": "Davinchi OIL",
-  "version": "0.1",
+  "version": "0.1.1",
   "description": "Send content to Davinchi Resolve BIN",
   "permissions": [
     "contextMenus",
     "notifications",
     "tabs",
     "activeTab",
-    "scripting"
+    "scripting",
+    "<all_urls>",
+    "http://localhost:55500/*"
   ],
   "background": {
     "scripts": ["background.js"]
   },
-  "action":{
-      "default_popup": "popup.html",
-      "default_icon": {
-          "16": "./images/icon-16x16.png",
-          "32": "./images/icon-32x32.png",
-          "128": "./images/icon-128x128.png"
-      }
-  },
- "host_permissions": ["http://localhost:55500/*"]
+  "default_icon": {
+    "16": "./images/icon-16x16.png",
+    "32": "./images/icon-32x32.png",
+    "128": "./images/icon-128x128.png"
+  }
 }
-  

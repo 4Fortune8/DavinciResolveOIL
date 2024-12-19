@@ -3,7 +3,7 @@
     "version": "0.1",
     "manifest_version": 3,
     "description": "Send content to Davinchi Resolve BIN",
-    "permissions": ["storage","notifications", "tabs", "activeTab","scripting","contextMenus","downloads"],
+    "permissions": ["notifications", "tabs","contextMenus"],
     "icons":{
         "128": "./images/icon-128x128.png"
     },
@@ -19,7 +19,8 @@
         }
     },
     "host_permissions": [
-        "http://localhost:55500/*"
+        "http://localhost:55500/*",
+        "<all_urls>"
     ],"commands": {
     "open-screen-captue": {
       "suggested_key": {

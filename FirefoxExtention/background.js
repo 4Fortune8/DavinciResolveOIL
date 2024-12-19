@@ -110,9 +110,6 @@ browser.commands.onCommand.addListener((command) => {
             }
           }
         );
-
-        browser.action.openPopup();
-        console.log("Popup opened");
       } else {
         console.error("No active tab found");
       }
