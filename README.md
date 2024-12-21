@@ -1,5 +1,6 @@
 # DavinchiResolveOIL
-**OIL** (Online Import Layer) is a tool built to intergrate browser activity with adding media and content directly to Davinchi resolve Media bin.
+**OIL** (Online Import Layer) is a tool built to sent imgages and videos directly from your browser to Davinchi resolve Media bin.
+
 
 ## How to use
 1. Install OIL and Download the browser extention
@@ -45,3 +46,11 @@ MP4Box is found at **https://github.com/gpac/gpac**  --- this will be used for w
 
 ## This is early beta, join my discord or leave an issue, or fix it yourself and merge your fix :)
 https://discord.gg/fC8wPvzWT7
+
+
+### serach engine key words
+
+Import to bin
+
+Browser to Resolve
+Browser save davinci resolve
