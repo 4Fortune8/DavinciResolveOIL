@@ -17,8 +17,8 @@ Same thing, scrip file path is "/Library/Application Support/Blackmagic Design/D
 
 
 
-**Tools used
-MP4Box is found at **https://github.com/gpac/gpac**
+##Tools used or planned to be used
+MP4Box is found at **https://github.com/gpac/gpac**  --- this will be used for wrangling file formats not compatabile with resolve
 
 ##This is early beta, join my discord or leave an issue  
 https://discord.gg/fC8wPvzWT7
