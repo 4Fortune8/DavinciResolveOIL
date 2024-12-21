@@ -15,10 +15,12 @@ Same thing but the Max autoset up
 ## manual 
 ### windows
 copy the oilServer.lua file to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\"
+
 copy all files in LUAPackages to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Modules\Lua\"
 
 ### mac
 copy the oilServer.lua file to "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/"
+
 copy all files in LUAPackages to "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Modules/Lua/"
 
 
