@@ -12,7 +12,7 @@ install the browser extention (firefox should work below, chrome is coming soon 
 Same thing but the Max autoset up
 
 
-## manual Setup
+## Manual Setup
 ### windows
 copy the oilServer.lua file to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\"
 
