@@ -1,5 +1,5 @@
 # DavinchiResolveOIL
-**OIL** (Online Import Layer) is a tool built to sent imgages and videos directly from your browser to Davinchi resolve Media bin.
+**OIL** (Online Import Layer) is a tool built to sent images and videos directly from your browser to Davinchi resolve Media bin.
 
 
 ## How to use
