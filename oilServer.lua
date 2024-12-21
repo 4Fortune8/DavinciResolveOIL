@@ -21,20 +21,10 @@ end
 
 function download_file(url, getfilepath)
     local sanitized_url = sanitize_filename(url)
+    print('curl  --create-dirs -O --output-dir "' .. getfilepath .. '" "' .. url .. '"')
     os.execute('curl  --create-dirs -O --output-dir "' .. getfilepath .. '" "' .. url .. '"')
 end
 
-
-function alt_download(url, getfilepath)
-    local command = string.format('curl -s -o "%s" "%s"', getfilepath, url)
-    local result = os.execute(command)
-    if result == 0 then
-        print("Downloaded:", outputPath)
-    else
-        print("Failed to download:", url)
-    end
-    
-end
 
 function receive_text(data)
     local text = data.releventString or ""
@@ -92,12 +82,8 @@ function AddMediaToBin(data, filePath,boolCurl)
     if not success then
         print("Error while processing files:", err)
     end
+    download_file(data, filePath)
     
-    if (boolCurl) then
-        download_file(data, filePath)
-    else 
-        alt_download(data,filePath)
-    end
         local mediaStorage = resolve:GetMediaStorage()
     local files = mediaStorage:GetFileList(filePath)
       -- Step 2: Compare new records against the old records set
@@ -111,7 +97,11 @@ function AddMediaToBin(data, filePath,boolCurl)
         end
     end
 end
+
+
+local oldfilePath = ''
 function startCooking()
+    local refresh = true   
     print("[AutoSubs Server] Cooked With OIL")                        
     local mountedVolumeList = resolve:GetMediaStorage():GetMountedVolumes()
     local rootFolder = mountedVolumeList[1]
@@ -120,6 +110,11 @@ function startCooking()
     print("currentProject: ", currentProject)
     local filePath = rootFolder .. '\\' .. currentProject
     print("Mounted Volume List: ", filePath)
+    if (oldfilePath ~= filePath) then
+        print('mkdir "' .. filePath .. '"')
+        os.execute('mkdir "' .. filePath .. '"')
+        oldfilePath = filePath
+    end
     return filePath
     
 end
