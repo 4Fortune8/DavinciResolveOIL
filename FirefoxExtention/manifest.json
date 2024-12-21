@@ -1,17 +1,24 @@
 {
   "manifest_version": 2,
   "name": "Davinchi OIL",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Send content to Davinchi Resolve BIN",
   "permissions": [
     "contextMenus",
     "notifications",
     "activeTab",
+    "scripting",
     "http://localhost:55500/*"
   ],
   "background": {
     "scripts": ["background.js"]
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }],
   "icons": {
     "16": "./images/icon-16x16.png",
     "32": "./images/icon-32x32.png",
