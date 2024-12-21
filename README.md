@@ -1,5 +1,5 @@
 # DavinchiResolveOIL
-Online Import Layer is a tool built to intergrate browser activity with adding media and content directly to Davinchi resolve Media bin.
+**OIL** (Online Import Layer) is a tool built to intergrate browser activity with adding media and content directly to Davinchi resolve Media bin.
 
 ## How to use
 1. Install OIL and Download the browser extention
