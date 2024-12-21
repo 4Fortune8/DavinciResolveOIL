@@ -13,11 +13,11 @@ Same thing but the Max autoset up
 
 
 ## manual 
-# windows
+### windows
 copy the oilServer.lua file to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\"
 copy all files in LUAPackages to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Modules\Lua\"
 
-# mac
+### mac
 copy the oilServer.lua file to "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/"
 copy all files in LUAPackages to "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Modules/Lua/"
 
@@ -28,8 +28,8 @@ copy all files in LUAPackages to "Library/Application Support/Blackmagic Design/
 
 
 
-### Tools used or planned to be used
+## Tools used or planned to be used
 MP4Box is found at **https://github.com/gpac/gpac**  --- this will be used for wrangling file formats not compatabile with resolve
 
-### This is early beta, join my discord or leave an issue, or fix it yourself and merge your fix :)
+## This is early beta, join my discord or leave an issue, or fix it yourself and merge your fix :)
 https://discord.gg/fC8wPvzWT7
