@@ -5,7 +5,7 @@ Online Import Layer is a tool built to intergrate browser activity with adding m
 1. Install OIL and Download the browser extention
 2. open a resolve project
 3. click On Workspace -> Script -> OilServer
-4. Find a phonto or video (mp4 only for now)
+4. Find a phonto or video (mp4 only for now, Ill add more formats in OIL 0.2)
 5. Right Click, hoveer over Davinci oil
 6. Send to API
 7. When done right click in browser -> hover over Davinci oil -> press exit
