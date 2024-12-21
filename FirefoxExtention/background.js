@@ -32,37 +32,49 @@ function makenotifications(title, message) {
 }
 
 
-
-browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-    if (changeInfo.status === "complete") {
-      browser.scripting
-        .executeScript({
-          target: { tabId },
-          files: ["./content.js"],
-        })
-        .then(() => {
-          console.log("content script injected");
-        })
-        .catch((err) => console.log(err, "error injecting script"));
-    }
-  });
-  
 // Handle the context menu click
-browser.contextMenus.onClicked.addListener((info) => {
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
   console.log(info);
-  if (info.menuItemId === "sendMediaToApi" && info.srcUrl) {
-    const mediaUrl = info.srcUrl; // URL of the image or video
-    sendStringToApi('save_image',mediaUrl).then((result) => {
-      if (result != "true") {
-        console.log(result);
-        const title = "Failed To send, check if localhost is running";
-        const message =
-          "Failed to send media URL. Please check if the local API is running.";
-        makenotifications(title, message);
+  if (info.menuItemId === "sendMediaToApi") {
+    if (info.srcUrl && info.srcUrl.trim() !== "") {
+      // srcUrl is present, send it to API as before
+      const mediaUrl = info.srcUrl;
+      sendStringToApi('save_image', mediaUrl).then((result) => {
+        if (result != "true") {
+          console.log(result);
+          const title = "Failed To send, check if localhost is running";
+          const message =
+            "Failed to send media URL. Please check if the local API is running.";
+          makenotifications(title, message);
+        }
+      });
+    } else {
+      // srcUrl is empty, request parent element data from content script
+      const response = await browser.tabs.sendMessage(tab.id, { action: "getParentElementData" });
+      console.log(response)
+      console.log(response.srcText)
+      if (response && response.srcText) {
+        // You now have the parent element's data
+        console.log("Parent Element Data:", response.srcText);
+        
+        // Extract some string from the parent element if needed. For example:
+        // Let’s say we decide to send the parent’s outerHTML to the API.
+        const parentOuterHTML = response.srcText;
+        
+        sendStringToApi('save_alternative', parentOuterHTML).then((result) => {
+          if (result != "true") {
+            console.log(result);
+            const title = "Failed To send parent element data, check if localhost is running";
+            const message =
+              "Failed to send parent element data. Please check if the local API is running.";
+            makenotifications(title, message);
+          }
+        });
+      } else {
+        console.log("No parent element data returned.");
       }
-    });
-  }
-  else if (info.menuItemId === 'exit') {
+    }
+  } else if (info.menuItemId === 'exit') {
     exit().then((result) => {
       if (result != "true") {
         console.log(result);
@@ -75,63 +87,8 @@ browser.contextMenus.onClicked.addListener((info) => {
   }
 });
 
-browser.commands.onCommand.addListener((command) => {
-  console.log(`Command: ${command}`);
-  if (command === "open-screen-captue") {
-    // Get the current active tab
-    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        const currentTab = tabs[0];
-        console.log("Current Tab:", currentTab);
-
-        // Perform any action with the current tab
-        // For example, you can send a message to the content script
-        browser.tabs.sendMessage(
-          currentTab.id,
-          { action: "recording_request" },
-          (response) => {
-            if (browser.runtime.lastError) {
-              console.error(
-                "Error sending message:",
-                browser.runtime.lastError.message
-              );
-              const title = "Screen Recorder Error";
-              const message =
-                "Failed to start screen recording. Please refresh the page, or go to a different tab to start capture.";
-              makenotifications(title, message);
-            } else {
-              console.log("Response from content script:", response);
-              if (response === undefined) {
-                const title = "cannot start capture on base browser pages";
-                const message =
-                  "Failed to start screen recording. Please or go to a different tab or page to start capture.";
-                makenotifications(title, message);
-              }
-            }
-          }
-        );
-
-        browser.action.openPopup();
-        console.log("Popup opened");
-      } else {
-        console.error("No active tab found");
-      }
-    });
-  }
-});
-
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "get_tab_title") {
-    browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0) {
-        sendResponse({ tabTitle: tabs[0].title });
-      } else {
-        sendResponse({ tabTitle: null });
-      }
-    });
-    return true; // Keep the message channel open for sendResponse
-    //the file save name to send to the backend. 
-  } else if (message.action === "save_name") {
+ if (message.action === "save_name") {
     sendStringToApi('save_video',message.saveName).then((result) => {
       if (result != "true") {
         console.log(result);
@@ -143,6 +100,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 });
+
 function exit() {
   const apiUrl = `http://localhost:55500`; // Replace with your local API endpoint
   console.log("Sending exit to API:", apiUrl);

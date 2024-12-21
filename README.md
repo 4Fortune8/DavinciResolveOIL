@@ -15,5 +15,10 @@ Same thing, scrip file path is "/Library/Application Support/Blackmagic Design/D
 
 **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/davinchi-oil/)** | **[Chrome]** Dev Only Option currently
 
+
+
+**Tools used
+MP4Box is found at **https://github.com/gpac/gpac**
+
 ##This is early beta, join my discord or leave an issue  
 https://discord.gg/fC8wPvzWT7

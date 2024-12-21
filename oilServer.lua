@@ -1,9 +1,10 @@
 local socket = require("ljsocket")
 local json = require("dkjson")
 local ffi = require("ffi")
+
 -- Windows sleep function (no terminal by using ffi instead of os.execute)
 ffi.cdef [[ void Sleep(unsigned int ms); ]]
- 
+
 
 local fusion = resolve:Fusion()
 local project = resolve:GetProjectManager():GetCurrentProject()
@@ -21,6 +22,18 @@ end
 function download_file(url, getfilepath)
     local sanitized_url = sanitize_filename(url)
     os.execute('curl  --create-dirs -O --output-dir "' .. getfilepath .. '" "' .. url .. '"')
+end
+
+
+function alt_download(url, getfilepath)
+    local command = string.format('curl -s -o "%s" "%s"', getfilepath, url)
+    local result = os.execute(command)
+    if result == 0 then
+        print("Downloaded:", outputPath)
+    else
+        print("Failed to download:", url)
+    end
+    
 end
 
 function receive_text(data)
@@ -66,7 +79,7 @@ function CreateResponse(body)
     return response
 end
 
-function AddMediaToBin(data, filePath)
+function AddMediaToBin(data, filePath,boolCurl)
     print("Adding media to bin")
     local mediaStorage = resolve:GetMediaStorage()
     local files = mediaStorage:GetFileList(filePath)
@@ -79,9 +92,13 @@ function AddMediaToBin(data, filePath)
     if not success then
         print("Error while processing files:", err)
     end
-  
-    download_file(data, filePath)
-    local mediaStorage = resolve:GetMediaStorage()
+    
+    if (boolCurl) then
+        download_file(data, filePath)
+    else 
+        alt_download(data,filePath)
+    end
+        local mediaStorage = resolve:GetMediaStorage()
     local files = mediaStorage:GetFileList(filePath)
       -- Step 2: Compare new records against the old records set
     for _, newRecord in ipairs(files) do
@@ -94,7 +111,18 @@ function AddMediaToBin(data, filePath)
         end
     end
 end
-
+function startCooking()
+    print("[AutoSubs Server] Cooked With OIL")                        
+    local mountedVolumeList = resolve:GetMediaStorage():GetMountedVolumes()
+    local rootFolder = mountedVolumeList[1]
+    print("rootFolder: ", rootFolder)
+    local currentProject = project:GetName()
+    print("currentProject: ", currentProject)
+    local filePath = rootFolder .. '\\' .. currentProject
+    print("Mounted Volume List: ", filePath)
+    return filePath
+    
+end
 local quitServer = false
 while not quitServer do
     -- Check if DaVinci Resolve is still running
@@ -130,20 +158,22 @@ while not quitServer do
                             message = "Invalid JSON data"
                         })
                         print("Invalid JSON data")
-                    elseif data.func == "save_image" then -- this is h
-                        print("[AutoSubs Server] Cooked With OIL")
-                                           
-                        local mountedVolumeList = resolve:GetMediaStorage():GetMountedVolumes()
-                        local rootFolder = mountedVolumeList[1]
-                        print("rootFolder: ", rootFolder)
-                        local currentProject = project:GetName()
-                        print("currentProject: ", currentProject)
-                        local filePath = rootFolder .. '\\' .. currentProject
+                    elseif data.func == "save_image" then -- this is h                                  
+                        local filePath = startCooking()
                         print("Mounted Volume List: ", filePath)
                         AddMediaToBin(data.releventString,filePath)
                         body = json.encode({
                             message = "Job completed"
                         })
+
+                        elseif data.func == "save_alternative" then -- this is h
+                        local filePath = startCooking()
+                        AddMediaToBin(data.releventString,filePath)
+                        body = json.encode({
+                            message = "Job completed"
+                        })
+
+                        
                     elseif data.func == "Exit" then
                         print("Exiting server")
                         quitServer = true
