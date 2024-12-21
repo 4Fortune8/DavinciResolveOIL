@@ -1,7 +1,7 @@
 # DavinchiResolveOIL
 Online Import Layer is a tool built to intergrate browser activity with adding media and content directly to Davinchi resolve Media bin.
 
-## Setup
+## Auto Setup
 
 ### To install OIL on windows:
 Click on the autoinstaller 
@@ -12,7 +12,7 @@ install the browser extention (firefox should work below, chrome is coming soon 
 Same thing but the Max autoset up
 
 
-## manual 
+## manual Setup
 ### windows
 copy the oilServer.lua file to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\"
 
