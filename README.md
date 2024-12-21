@@ -4,12 +4,12 @@ Online Import Layer is a tool built to intergrate browser activity with adding m
 ## Auto Setup
 
 ### To install OIL on windows:
-Click on the autoinstaller 
+Click on AutosetupDavinchi
 
 install the browser extention (firefox should work below, chrome is coming soon to app store)
 
 ### on Mac
-Same thing but the Max autoset up
+Same thing but MacAutoInstaller.sh
 
 
 ## Manual Setup
