@@ -1,6 +1,11 @@
 # DavinchiResolveOIL
 **OIL** (Online Import Layer) is a tool built to sent images and videos directly from your browser to Davinchi resolve Media bin.
 
+This project was inspired by Autosubs and borrows some code and logic
+https://github.com/tmoroney/auto-subs/tree/main/AutoSubs-App
+Check it out its amazing
+
+
 ## Installation Guide Video 
 [![Now in Android: 55](https://i.ytimg.com/vi/IxSOCcOuSbE/maxresdefault.jpg)](https://www.youtube.com/watch?v=IxSOCcOuSbE "Now in Android: 55")    
 
