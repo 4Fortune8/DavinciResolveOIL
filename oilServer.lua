@@ -6,13 +6,13 @@ local ffi = require("ffi")
 ffi.cdef [[ void Sleep(unsigned int ms); ]]
 
 
-local fusion = resolve:Fusion()
-local project = resolve:GetProjectManager():GetCurrentProject()
-
-local mediaPool = project:GetMediaPool()
-local rootFolder = mediaPool:GetRootFolder()
-local currentProject = project:GetName()
-
+fusion = resolve:Fusion()
+project = resolve:GetProjectManager():GetCurrentProject()
+mediaPool = project:GetMediaPool()
+rootFolder = mediaPool:GetRootFolder()
+currentProject = project:GetName()
+print(project)
+print(fusion)
 
 
 function sanitize_filename(filename)
@@ -99,9 +99,22 @@ function AddMediaToBin(data, filePath,boolCurl)
 end
 
 
+function refreshProject()
+    print("starting Refresh")
+    fusion = resolve:Fusion()
+    project = resolve:GetProjectManager():GetCurrentProject()
+    print(project)
+    print(fusion)
+    mediaPool = project:GetMediaPool()
+    rootFolder = mediaPool:GetRootFolder()
+    currentProject = project:GetName()
+end
+
+
 local oldfilePath = ''
 function startCooking()
     local refresh = true   
+
     print("[AutoSubs Server] Cooked With OIL")                        
     local mountedVolumeList = resolve:GetMediaStorage():GetMountedVolumes()
     local rootFolder = mountedVolumeList[1]
@@ -114,6 +127,8 @@ function startCooking()
         print('mkdir "' .. filePath .. '"')
         os.execute('mkdir "' .. filePath .. '"')
         oldfilePath = filePath
+        
+
     end
     return filePath
     
@@ -135,7 +150,11 @@ while not quitServer do
             assert(client:set_blocking(false))
             -- Try to receive data (example HTTP request)
             local str, err = client:receive()
-            
+            if not project:GetName() then 
+                refreshProject()
+                ffi.C.Sleep(200)
+            end
+
             if str then
                 print("Received request:", str)
                 -- Split the request by the double newline
@@ -157,6 +176,8 @@ while not quitServer do
                         local filePath = startCooking()
                         print("Mounted Volume List: ", filePath)
                         AddMediaToBin(data.releventString,filePath)
+                        print(project)
+print(fusion)
                         body = json.encode({
                             message = "Job completed"
                         })
