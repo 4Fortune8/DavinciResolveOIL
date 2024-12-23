@@ -2,8 +2,43 @@ local socket = require("ljsocket")
 local json = require("dkjson")
 local ffi = require("ffi")
 
--- Windows sleep function (no terminal by using ffi instead of os.execute)
-ffi.cdef [[ void Sleep(unsigned int ms); ]]
+local os_name = ffi.os
+
+print("Operating System: " .. os_name)
+
+
+local command_close
+
+if os_name == "Windows" then
+    -- Define the necessary Windows API functions using FFI
+    -- Note: Sleep and ShellExecuteA are used to prevent terminal from opening (replaces os.execute)
+    ffi.cdef [[
+        typedef wchar_t WCHAR;
+
+        int MultiByteToWideChar(
+            unsigned int CodePage,
+            unsigned long dwFlags,
+            const char* lpMultiByteStr,
+            int cbMultiByte,
+            WCHAR* lpWideCharStr,
+            int cchWideChar);
+
+        void* _wfopen(const WCHAR* filename, const WCHAR* mode);
+        size_t fread(void* buffer, size_t size, size_t count, void* stream);
+        int fclose(void* stream);
+        void Sleep(unsigned int ms);
+        int ShellExecuteA(void* hwnd, const char* lpOperation, const char* lpFile, const char* lpParameters, const char* lpDirectory, int nShowCmd);
+    ]]
+
+elseif os_name == "OSX" then
+    -- Use the C system function to execute shell commands on macOS
+    ffi.cdef [[ int system(const char *command); ]]
+
+   
+else
+    print("Unsupported OS")
+    return
+end
 
 
 fusion = resolve:Fusion()
@@ -11,8 +46,7 @@ project = resolve:GetProjectManager():GetCurrentProject()
 mediaPool = project:GetMediaPool()
 rootFolder = mediaPool:GetRootFolder()
 currentProject = project:GetName()
-print(project)
-print(fusion)
+
 
 
 function sanitize_filename(filename)
@@ -121,7 +155,7 @@ function startCooking()
     print("rootFolder: ", rootFolder)
     local currentProject = project:GetName()
     print("currentProject: ", currentProject)
-    local filePath = rootFolder .. '\\' .. currentProject
+    local filePath = rootFolder .. '/' .. currentProject
     print("Mounted Volume List: ", filePath)
     if (oldfilePath ~= filePath) then
         print('mkdir "' .. filePath .. '"')
@@ -133,8 +167,22 @@ function startCooking()
     return filePath
     
 end
+
+function sleep(n)
+    if os_name == "Windows" then
+        -- Windows
+        ffi.C.Sleep(n * 1000)
+    else
+        -- Unix-based (Linux, macOS)
+        os.execute("sleep " .. tonumber(n))
+    end
+end
+
+
 local quitServer = false
 while not quitServer do
+	
+
     -- Check if DaVinci Resolve is still running
     if not resolve then
         print("DaVinci Resolve is not running. Shutting down server...")
@@ -152,7 +200,7 @@ while not quitServer do
             local str, err = client:receive()
             if not project:GetName() then 
                 refreshProject()
-                ffi.C.Sleep(200)
+                sleep(200)
             end
 
             if str then
@@ -223,7 +271,9 @@ print(fusion)
     elseif err ~= "timeout" then
         error(err)
     end
-    ffi.C.Sleep(100)  -- Replace sleep with ffi.C.Sleep (100 ms)
+
+    sleep(1)  -- Replace sleep with ffi.C.Sleep (100 ms)
+
 end
 
 print("Shutting down AutoSubs server...")
