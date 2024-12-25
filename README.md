@@ -33,7 +33,7 @@ Same thing but MacAutoInstaller.sh
 
 ## Extensions
 
-**[Firefox](https://addons.mozilla.org/en-US/firefox/addon/davinchi-oil/)** | **[Chrome]**(https://chromewebstore.google.com/detail/davinchi-oil/akjgkdnifpjpjkhfajnmbeegkkaipeko?authuser=0&hl=en)
+**[Firefox](https://addons.mozilla.org/en-US/firefox/addon/davinchi-oil/)** | **[Chrome](https://chromewebstore.google.com/detail/davinchi-oil/akjgkdnifpjpjkhfajnmbeegkkaipeko?authuser=0&hl=en)**
 
 
  
