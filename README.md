@@ -1,4 +1,4 @@
-# DavinchiResolveOIL
+# DavinciResolveOIL
 **OIL** (Online Import Layer) is a tool built to sent images and videos directly from your browser to Davinchi resolve Media bin.
 
 This project was inspired by Autosubs and borrows some code and logic
