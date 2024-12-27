@@ -1,5 +1,5 @@
 # DavinciResolveOIL
-**OIL** (Online Import Layer) is a tool built to sent images and videos directly from your browser to Davinchi resolve Media bin.
+**OIL** (Online Import Layer) is a tool built to sent images and videos directly from your browser to Davinci resolve Media bin.
 
 This project was inspired by Autosubs and borrows some code and logic
 https://github.com/tmoroney/auto-subs
@@ -8,11 +8,11 @@ Check it out its amazing
 
 
 ## Installation Guide Video 
-[![Now in Android: 55](https://i.ytimg.com/vi/IxSOCcOuSbE/maxresdefault.jpg)](https://www.youtube.com/watch?v=IxSOCcOuSbE "Now in Android: 55")    
+[![setup: 55](https://i.ytimg.com/vi/IxSOCcOuSbE/maxresdefault.jpg)](https://www.youtube.com/watch?v=IxSOCcOuSbE "Now in Android: 55")    
 
 
 ## How to use
-1. Install OIL and Download the browser extention
+1. Install OIL and Download the browser extention **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/davinchi-oil/)** | **[Chrome](https://chromewebstore.google.com/detail/davinchi-oil/akjgkdnifpjpjkhfajnmbeegkkaipeko?authuser=0&hl=en)**
 2. open a resolve project
 3. click On Workspace -> Script -> OilServer
 4. Find a phonto or video (mp4 only for now, Ill add more formats in OIL 0.2)
@@ -23,9 +23,9 @@ Check it out its amazing
 ## Auto Setup
 
 ### To install OIL on windows:
-Click on AutosetupDavinchi
+Click on AutosetupDavinci
 
-install the browser extention (firefox should work below, chrome is coming soon to app store)
+install the browser extention 
 
 ### on Mac
 Same thing but MacAutoInstaller.sh
