@@ -8,7 +8,7 @@ Check it out its amazing
 
 
 ## Installation Guide Video 
-[![setup: 55](https://i.ytimg.com/vi/IxSOCcOuSbE/maxresdefault.jpg)](https://www.youtube.com/watch?v=IxSOCcOuSbE "Now in Android: 55")    
+
 
 
 ## How to use
