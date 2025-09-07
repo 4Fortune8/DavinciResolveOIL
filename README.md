@@ -30,6 +30,10 @@ install the browser extention
 ### on Mac
 Same thing but MacAutoInstaller.sh
 
+### on linux 
+chmod +x install_linux.sh
+./install_linux.sh
+
 
 ## Extensions
 
@@ -47,6 +51,11 @@ copy all files in LUAPackages to "%APPDATA%\Blackmagic Design\DaVinci Resolve\Su
 copy the oilServer.lua file to "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/"
 
 copy all files in LUAPackages to "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Modules/Lua/"
+
+### linux 
+copy the oilServer.lua file to "~/.local/share/DaVinciResolve/Fusion/Templates/Fusion/Scripts/Utility/"
+
+copy all files in LUAPackages to "~/.local/share/DaVinciResolve/Fusion/Modules/Lua/"
 
 
 
