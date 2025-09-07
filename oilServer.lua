@@ -3,15 +3,10 @@ local json = require("dkjson")
 local ffi = require("ffi")
 
 local os_name = ffi.os
-
 print("Operating System: " .. os_name)
 
-
-local command_close
-
+-- OS-specific setup
 if os_name == "Windows" then
-    -- Define the necessary Windows API functions using FFI
-    -- Note: Sleep and ShellExecuteA are used to prevent terminal from opening (replaces os.execute)
     ffi.cdef [[
         typedef wchar_t WCHAR;
 
@@ -27,64 +22,73 @@ if os_name == "Windows" then
         size_t fread(void* buffer, size_t size, size_t count, void* stream);
         int fclose(void* stream);
         void Sleep(unsigned int ms);
-        int ShellExecuteA(void* hwnd, const char* lpOperation, const char* lpFile, const char* lpParameters, const char* lpDirectory, int nShowCmd);
+        int ShellExecuteA(void* hwnd, const char* lpOperation, const char* lpFile,
+                          const char* lpParameters, const char* lpDirectory, int nShowCmd);
     ]]
-
-elseif os_name == "OSX" then
-    -- Use the C system function to execute shell commands on macOS
+elseif os_name == "OSX" or os_name == "Linux" then
     ffi.cdef [[ int system(const char *command); ]]
-
-   
 else
-    print("Unsupported OS")
+    print("Unsupported OS: " .. tostring(os_name))
     return
 end
 
-
+-- Resolve / Fusion API setup
 fusion = resolve:Fusion()
 project = resolve:GetProjectManager():GetCurrentProject()
 mediaPool = project:GetMediaPool()
 rootFolder = mediaPool:GetRootFolder()
 currentProject = project:GetName()
 
-
-
+-- Helpers
 function sanitize_filename(filename)
     return filename:gsub("[^%w%-_%. ]", "_")
 end
 
 function download_file(url, getfilepath)
-    local sanitized_url = sanitize_filename(url)
-    print('curl  --create-dirs -O --output-dir "' .. getfilepath .. '" "' .. url .. '"')
-    os.execute('curl  --create-dirs -O --output-dir "' .. getfilepath .. '" "' .. url .. '"')
+    -- Try to extract the real filename (last path segment before query)
+    local basename = url:match("([^/]+)%?") or url:match("([^/]+)$") or "download.mp4"
+
+    -- Ensure we have an extension
+    if not basename:match("%.[%a%d]+$") then
+        basename = basename .. ".mp4"
+    end
+
+    -- Sanitize for filesystem
+    local safe_name = sanitize_filename(basename)
+
+    local outpath = string.format('%s/%s', getfilepath, safe_name)
+    local cmd = string.format('curl --create-dirs -L -o "%s" "%s"', outpath, url)
+    print("Running:", cmd)
+    os.execute(cmd)
+
+    return outpath
 end
 
 
+function sleep(n)
+    if os_name == "Windows" then
+        ffi.C.Sleep(n * 1000)
+    else
+        os.execute("sleep " .. tonumber(n))
+    end
+end
+
 function receive_text(data)
     local text = data.releventString or ""
-    
-    local response = {
-        url = text,
-        message = "url received successfully"
-    }
+    local response = { url = text, message = "url received successfully" }
     print(response)
     return response
 end
 
--- Server
+-- HTTP server setup
 local port = 55500
-
--- Set up server socket configuration
 local info = socket.find_first_address("*", port)
 local server = assert(socket.create(info.family, info.socket_type, info.protocol))
-print("AutoSubs server is listening on port: ", port)
+print("AutoSubs server is listening on port:", port)
 
--- Set socket options
 server:set_blocking(false)
 assert(server:set_option("nodelay", true, "tcp"))
 assert(server:set_option("reuseaddr", true))
-
--- Bind and listen
 assert(server:bind(info))
 assert(server:listen())
 
@@ -94,190 +98,119 @@ function CreateResponse(body)
                    "Content-Type: application/json\r\n" ..
                    "Content-Length: " .. #body .. "\r\n" ..
                    "Connection: close\r\n" ..
-                   "Access-Control-Allow-Origin: *\r\n" ..  -- Add CORS header
-                   "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" ..  -- Add allowed methods
-                   "Access-Control-Allow-Headers: Content-Type\r\n" ..  -- Add allowed headers
-                   "\r\n"
-
-    local response = header .. body
-    return response
+                   "Access-Control-Allow-Origin: *\r\n" ..
+                   "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" ..
+                   "Access-Control-Allow-Headers: Content-Type\r\n\r\n"
+    return header .. body
 end
 
-function AddMediaToBin(data, filePath,boolCurl)
+function AddMediaToBin(url, filePath)
     print("Adding media to bin")
     local mediaStorage = resolve:GetMediaStorage()
-    local files = mediaStorage:GetFileList(filePath)
-    local newFiles = {}
-    local success, err = pcall(function()
-        for _, record in ipairs(files) do
-            newFiles[record] = true
-        end
-    end)
-    if not success then
-        print("Error while processing files:", err)
+    local oldFiles = {}
+    for _, record in ipairs(mediaStorage:GetFileList(filePath)) do
+        oldFiles[record] = true
     end
-    download_file(data, filePath)
-    
-        local mediaStorage = resolve:GetMediaStorage()
-    local files = mediaStorage:GetFileList(filePath)
-      -- Step 2: Compare new records against the old records set
-    for _, newRecord in ipairs(files) do
-        -- Step 3: If the record doesn't exist in oldSet, it's new and we should do something
-        if not newFiles[newRecord] then
-            -- Perform your operation here
-            -- For example, print a message or call a function:
-                mediaStorage:AddItemListToMediaPool(newRecord)
+
+    -- Download and capture the saved file path
+    local savedFile = download_file(url, filePath)
+
+    local newFiles = mediaStorage:GetFileList(filePath)
+    for _, newRecord in ipairs(newFiles) do
+        if not oldFiles[newRecord] then
+            mediaStorage:AddItemListToMediaPool(newRecord)
             print("New record found:", newRecord)
         end
     end
 end
 
-
 function refreshProject()
-    print("starting Refresh")
+    print("Refreshing Resolve project context")
     fusion = resolve:Fusion()
     project = resolve:GetProjectManager():GetCurrentProject()
-    print(project)
-    print(fusion)
     mediaPool = project:GetMediaPool()
     rootFolder = mediaPool:GetRootFolder()
     currentProject = project:GetName()
 end
 
-
 local oldfilePath = ''
 function startCooking()
-    local refresh = true   
-
-    print("[AutoSubs Server] Cooked With OIL")                        
+    print("[AutoSubs Server] Cooked With OIL")
     local mountedVolumeList = resolve:GetMediaStorage():GetMountedVolumes()
     local rootFolder = mountedVolumeList[1]
-    print("rootFolder: ", rootFolder)
     local currentProject = project:GetName()
-    print("currentProject: ", currentProject)
     local filePath = rootFolder .. '/' .. currentProject
-    print("Mounted Volume List: ", filePath)
-    if (oldfilePath ~= filePath) then
-        print('mkdir "' .. filePath .. '"')
-        os.execute('mkdir "' .. filePath .. '"')
-        oldfilePath = filePath
-        
 
+    if oldfilePath ~= filePath then
+        print("Creating dir:", filePath)
+        os.execute('mkdir -p "' .. filePath .. '"')
+        oldfilePath = filePath
     end
     return filePath
-    
 end
 
-function sleep(n)
-    if os_name == "Windows" then
-        -- Windows
-        ffi.C.Sleep(n * 1000)
-    else
-        -- Unix-based (Linux, macOS)
-        os.execute("sleep " .. tonumber(n))
-    end
-end
-
-
+-- Main server loop
 local quitServer = false
 while not quitServer do
-	
-
-    -- Check if DaVinci Resolve is still running
     if not resolve then
         print("DaVinci Resolve is not running. Shutting down server...")
         quitServer = true
-        client:close()
         break
     end
-    -- Server loop to handle client connections
+
     local client, err = server:accept()
     if client then
-        local peername, peer_err = client:get_peer_name()
+        local peername = client:get_peer_name()
         if peername then
             assert(client:set_blocking(false))
-            -- Try to receive data (example HTTP request)
-            local str, err = client:receive()
-            if not project:GetName() then 
+            local str = client:receive()
+            if not project:GetName() then
                 refreshProject()
-                sleep(200)
+                sleep(0.2)
             end
 
             if str then
                 print("Received request:", str)
-                -- Split the request by the double newline
-                local header_body_separator = "\r\n\r\n"
-                local _, _, content = string.find(str, header_body_separator .. "(.*)")
-                print("Received request:", content)
+                local content = str:match("\r\n\r\n(.*)")
+                print("Content:", content)
 
-                -- Parse the JSON content
-                local data, pos, err = json.decode(content, 1, nil)
+                local data, _, err = json.decode(content or "", 1, nil)
                 local body = ""
-                print("Data:", data)
-                local success, err = pcall(function()
-                    if data == nil then
-                        body = json.encode({
-                            message = "Invalid JSON data"
-                        })
-                        print("Invalid JSON data")
-                    elseif data.func == "save_image" then -- this is h                                  
-                        local filePath = startCooking()
-                        print("Mounted Volume List: ", filePath)
-                        AddMediaToBin(data.releventString,filePath)
-                        print(project)
-print(fusion)
-                        body = json.encode({
-                            message = "Job completed"
-                        })
 
-                        elseif data.func == "save_alternative" then -- this is h
+                local success, perr = pcall(function()
+                    if not data then
+                        body = json.encode({ message = "Invalid JSON data" })
+                    elseif data.func == "save_image" or data.func == "save_alternative" then
                         local filePath = startCooking()
-                        AddMediaToBin(data.releventString,filePath)
-                        body = json.encode({
-                            message = "Job completed"
-                        })
-
-                        
+                        AddMediaToBin(data.releventString, filePath)
+                        body = json.encode({ message = "Job completed" })
                     elseif data.func == "Exit" then
                         print("Exiting server")
                         quitServer = true
-                        body = json.encode({
-                            message = "Job completed"
-                        })
+                        body = json.encode({ message = "Job completed" })
                     else
-                        print("Invalid function name")
+                        body = json.encode({ message = "Invalid function name" })
                     end
                 end)
 
                 if not success then
-                    body = json.encode({
-                        message = "Job failed with error: " .. err
-                    })
-                    print("Error:", err)
+                    body = json.encode({ message = "Job failed: " .. tostring(perr) })
                 end
-                print("Response:", body)
-                -- Send HTTP response content
+
                 local response = CreateResponse(body)
                 assert(client:send(response))
-                -- Close connection
                 client:close()
-                
-            elseif err == "closed" then
+            else
                 client:close()
-            elseif err ~= "timeout" then
-                error(err)
             end
         end
-    elseif err ~= "timeout" then
+    elseif err and err ~= "timeout" then
         error(err)
     end
 
-    sleep(1)  -- Replace sleep with ffi.C.Sleep (100 ms)
-
+    sleep(1)
 end
 
 print("Shutting down AutoSubs server...")
-itm.Message.Text = "Shutting down..."
 server:close()
-win:Hide()
 print("Server shut down.")
