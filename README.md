@@ -53,7 +53,7 @@ copy the oilServer.lua file to "/Library/Application Support/Blackmagic Design/D
 
 copy all files in LUAPackages to "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Modules/Lua/"
 
-### linux 
+### Ubuntu/pop-os 
 copy the oilServer.lua file to "~/.local/share/DaVinciResolve/Fusion/Templates/Fusion/Scripts/Utility/"
 
 copy all files in LUAPackages to "~/.local/share/DaVinciResolve/Fusion/Modules/Lua/"
